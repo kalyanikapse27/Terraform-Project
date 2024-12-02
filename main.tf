@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = "5.77.0"
+      version = "5.78.0"
     }
   }
    backend "s3" {
@@ -15,7 +15,4 @@ terraform {
 
 provider "aws" {
   region =  "us-east-1"
-  profile = "default"
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
 }

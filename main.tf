@@ -5,12 +5,12 @@ terraform {
       version = "5.77.0"
     }
   }
-   backend "s3" {
-    bucket         = "tfstate-save-bucket"
-    key            = "dev/dev-terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "tfstate-Locktable" 
-  }
+  #  backend "s3" {
+  #   bucket         = "tfstate-save-bucket"
+  #   key            = "dev/dev-terraform.tfstate"
+  #   region         = "us-east-1"
+  #   dynamodb_table = "tfstate-Locktable" 
+  # }
 }
 
 provider "aws" {

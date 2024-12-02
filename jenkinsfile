@@ -1,0 +1,53 @@
+pipeline {
+   agent any
+   
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION    = 'us-east-1'
+    }
+   stages {
+    stage('Checkout') {
+      steps {
+        script {
+           // The below will clone your repo and will be checked out to master branch by default.
+           git url: 'https://github.com/kalyanikapse27/Terraform-Project'
+           // Do a ls -lart to view all the files are cloned. It will be clonned. This is just for you to be sure about it.
+           sh "ls -lart ./*" 
+           // List all branches in your repo. 
+           sh "git branch -a"
+          }
+       }
+    }
+   stage('Terraform init') {
+        steps {
+            sh "terraform init -upgrade"
+            }
+    }
+    stage('Terraform plan') {
+        steps {
+            sh 'terraform plan -out tfplan'
+            sh 'terraform show -no-color tfplan > tfplan.txt'
+            }
+        }
+    stage('Apply / Destroy') {
+            steps {
+                script {
+                    if (params.action == 'apply') {
+                        if (!params.autoApprove) {
+                            def plan = readFile 'tfplan.txt'
+                            input message: "Do you want to apply the plan?",
+                            parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                        }
+
+                        sh 'terraform ${action} -input=false tfplan'
+                    } else if (params.action == 'destroy') {
+                        sh 'terraform ${action} --auto-approve'
+                    } else {
+                        error "Invalid action selected. Please choose either 'apply' or 'destroy'."
+                    }
+                }
+            }
+        }
+   }
+}
